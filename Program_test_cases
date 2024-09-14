@@ -1,0 +1,76 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class WordCounter
+{
+    static void Main()
+    {
+        // Prepare test cases
+        string[] testCases = {
+            "Go do that thing that you do so well", // Normal case
+            "Hello, hello HELLO! Are you there?", // Case insensitivity and punctuation
+            "The quick brown fox jumps over the lazy dog. The dog barks.", // Common text
+            "" // Empty input
+        };
+
+        // Expected outputs for each case
+        List<Dictionary<string, int>> expectedResults = new List<Dictionary<string, int>>()
+        {
+            new Dictionary<string, int> { {"go", 1}, {"do", 2}, {"that", 2}, {"thing", 1}, {"you", 1}, {"so", 1}, {"well", 1} },
+            new Dictionary<string, int> { {"hello", 3}, {"are", 1}, {"you", 1}, {"there", 1} },
+            new Dictionary<string, int> { {"the", 3}, {"quick", 1}, {"brown", 1}, {"fox", 1}, {"jumps", 1}, {"over", 1}, {"lazy", 1}, {"dog", 2}, {"barks", 1} },
+            new Dictionary<string, int>() // Empty result
+        };
+
+        for (int i = 0; i < testCases.Length; i++)
+        {
+            Console.WriteLine($"\nTest Case {i + 1}:");
+            string input = testCases[i];
+            Dictionary<string, int> result = CountWords(input);
+            PrintWordCounts(result);
+            ValidateResult(result, expectedResults[i]);
+        }
+    }
+
+    static Dictionary<string, int> CountWords(string text)
+    {
+        // Split text into words, converting all to lower case for uniformity
+        string[] words = text.Split(new char[] { ' ', '.', ',', ';', ':', '-', '_', '/', '\n', '\r', '\t', '!', '?' }, StringSplitOptions.RemoveEmptyEntries)
+                             .Select(w => w.ToLower())
+                             .ToArray();
+
+        // Create a dictionary to store word counts
+        Dictionary<string, int> wordCounts = new Dictionary<string, int>();
+
+        // Count occurrences of each word
+        foreach (string word in words)
+        {
+            if (wordCounts.ContainsKey(word))
+            {
+                wordCounts[word]++;
+            }
+            else
+            {
+                wordCounts[word] = 1;
+            }
+        }
+
+        return wordCounts;
+    }
+
+    static void PrintWordCounts(Dictionary<string, int> wordCounts)
+    {
+        foreach (var kvp in wordCounts)
+        {
+            Console.WriteLine($"{kvp.Value}: {kvp.Key}");
+        }
+    }
+
+    static void ValidateResult(Dictionary<string, int> actual, Dictionary<string, int> expected)
+    {
+        bool isValid = actual.Count == expected.Count && !actual.Except(expected).Any();
+        Console.WriteLine(isValid ? "Test Passed" : "Test Failed");
+    }
+}
